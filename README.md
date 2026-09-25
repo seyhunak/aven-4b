@@ -1,5 +1,11 @@
 # Aven-4B
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97_Hugging_Face-aven--4b-yellow)](https://huggingface.co/seyhunak/aven-4b)
+[![GitHub](https://img.shields.io/badge/GitHub-seyhunak%2Faven--4b-black?logo=github)](https://github.com/seyhunak/aven-4b)
+[![Demo](https://img.shields.io/badge/demo-50_tickets_live-brightgreen)](demo/)
+[![Tests](https://img.shields.io/badge/tests-13_passing-success)](demo/tests/)
+
 **Small, fast specialist decision model.** Aven-4B fine-tunes a general ~4B
 open model with LoRA into a structured-decision classifier:
 
@@ -194,6 +200,8 @@ cd demo && npm install && npm run build && npx .
 Verified 50/50 correct, 0 invalid through the live HTTP path. See
 `demo/README.md`. The demo engine is a deterministic mirror of the decision
 contract; production inference with real weights is `scripts/inference.py`.
+
+<video src="assets/demo.mp4" controls muted playsinline width="100%"></video>
 
 ## 10. Layout
 
