@@ -202,16 +202,33 @@ GitHub:
 ./scripts/publish_github.sh YOUR_GITHUB_USERNAME aven-4b
 ```
 
-## 10. Layout
+## 10. Live demo (Next.js one-pager)
+
+`demo/` is an npx-runnable one-page app: 50 preloaded finance tickets
+(invoice / PO matching, reconciliation triage, duplicates, tolerance,
+adversarial probes), each classified in real time by the server under Aven's
+label-only contract, with live accuracy/latency stats.
+
+```bash
+cd demo && npm install && npm run build && npx .
+# -> http://localhost:3000 (AVEN_PORT=4000 npx . for a custom port)
+```
+
+Verified 50/50 correct, 0 invalid through the live HTTP path. See
+`demo/README.md`. The demo engine is a deterministic mirror of the decision
+contract; production inference with real weights is `scripts/inference.py`.
+
+## 11. Layout
 
 ```text
 aven-4b/README.md  configs/mac_m3_48gb.yaml  data/*.jsonl
 scripts/{make_dataset,validate_dataset,train,evaluate,inference,merge_adapter,push_hf}.py
 scripts/publish_github.sh  src/aven/{prompt,inference,evaluation}.py
 tests/{test_dataset,test_prompt}.py
+demo/{app,lib,bin}  (Next.js live demo, see demo/README.md)
 ```
 
-## 11. Verified smoke-run results (M3, MPS)
+## 12. Verified smoke-run results (M3, MPS)
 
 Measured on 2026-09-25 — smoke config only (100 train samples, 1 epoch).
 Not a quality claim; shown to prove the pipeline works end to end.
@@ -224,7 +241,7 @@ Not a quality claim; shown to prove the pipeline works end to end.
 On this tiny synthetic set the base model is already strong — expected.
 Real gains require the full config plus a larger, real dataset.
 
-## 12. TODO
+## 13. TODO
 
 - [ ] Exact answer-span masking via offset mapping (current: prompt re-tokenize approx).
 - [ ] CUDA path: bf16 + optional 4-bit (`bitsandbytes`) behind a flag.
