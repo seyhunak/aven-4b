@@ -33,7 +33,16 @@ h1 { font-size: clamp(30px, 5vw, 52px); margin: 6px 0 4px; letter-spacing: -1px;
 .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
 .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; color: var(--dim); }
 .stat .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.stat .v.small { font-size: 15px; }
+.stat .sub2 { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+.perclass { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; margin: 4px 0 6px; }
+.perclass .k { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 10px; }
+.bar-row { display: grid; grid-template-columns: 24px 1fr 130px; gap: 10px; align-items: center; margin: 7px 0; }
+.bar-label { font-family: var(--mono); font-weight: 800; }
+.bar { height: 10px; background: #0b0f16; border-radius: 99px; overflow: hidden; }
+.bar > div { height: 100%; background: linear-gradient(90deg, var(--acc), var(--cyan)); transition: width 0.3s; }
+.bar-num { font-family: var(--mono); font-size: 12px; color: var(--dim); text-align: right; font-variant-numeric: tabular-nums; }
 
 .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 4px; }
 button { font: inherit; cursor: pointer; border-radius: 10px; border: 1px solid var(--line);
