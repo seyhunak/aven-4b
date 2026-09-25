@@ -201,7 +201,7 @@ Verified 50/50 correct, 0 invalid through the live HTTP path. See
 `demo/README.md`. The demo engine is a deterministic mirror of the decision
 contract; production inference with real weights is `scripts/inference.py`.
 
-<video src="assets/demo.mp4" controls muted playsinline width="100%"></video>
+[![Demo video — click to play](assets/demo-thumb.png)](assets/demo.mp4)
 
 ## 10. Layout
 
