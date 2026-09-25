@@ -6,7 +6,7 @@ import "./globals.css";
 type Option = { label: string; key: string; description: string };
 type Ticket = {
   id: string; category: string; tag: string; state: string;
-  question: string; options: Option[]; expected: string; adversarial?: string;
+  question: string;   options: Option[]; expected: string; adversarial?: string; variant?: string;
   facts: unknown;
 };
 type Result = {
@@ -21,7 +21,7 @@ export default function Page() {
   const [busy, setBusy] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [speed, setSpeed] = useState(220);
-  const [filter, setFilter] = useState<"all" | "correct" | "wrong" | "adversarial">("all");
+  const [filter, setFilter] = useState<"all" | "correct" | "wrong" | "adversarial" | "variations">("all");
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const stopRef = useRef(false);
 
@@ -84,6 +84,7 @@ export default function Page() {
 
   const visible = tickets.filter((t) => {
     if (filter === "adversarial") return !!t.adversarial;
+    if (filter === "variations") return !!t.variant;
     const r = results[t.id];
     if (filter === "correct") return r && r.label === t.expected;
     if (filter === "wrong") return r && r.label !== t.expected;
@@ -131,7 +132,7 @@ export default function Page() {
       </div>
 
       <div className="filters">
-        {(["all","correct","wrong","adversarial"] as const).map((f) => (
+        {(["all","correct","wrong","adversarial","variations"] as const).map((f) => (
           <button key={f} className={"chip"+(filter===f?" on":"")} onClick={()=>setFilter(f)}>{f}</button>
         ))}
       </div>
@@ -147,7 +148,7 @@ export default function Page() {
             <div key={t.id} className={`card ${cls}${open[t.id]?" open":""}`}>
               <div className="row1">
                 <span className="tid">{t.id} · {t.category}</span>
-                <span className={`tag${t.adversarial?" adv":""}`}>{t.adversarial ?? t.tag}</span>
+                <span className={`tag${t.adversarial?" adv":""}`}>{t.variant ?? t.adversarial ?? t.tag}</span>
               </div>
               <div className="state">{t.state}</div>
               <div className="out">

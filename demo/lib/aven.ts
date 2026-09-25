@@ -26,6 +26,7 @@ export type Ticket = {
   options: Option[];
   expected: string;
   adversarial?: string;
+  variant?: "paraphrase" | "format" | "boundary" | "order";
   facts: Facts;
 };
 
@@ -66,13 +67,13 @@ export function buildPrompt(t: Pick<Ticket, "state" | "question" | "options">): 
 export function extractLabel(
   raw: string | null | undefined,
   allowed: string[]
-): { label: string | null; status: "ok" | "extracted" | "invalid_output" } {
+): { label: string | null; status: "ok" | "extracted" | "invalid_output"; raw: string } {
   const norm = (raw ?? "").trim().toUpperCase();
-  if (allowed.includes(norm)) return { label: norm, status: "ok" };
+  if (allowed.includes(norm)) return { label: norm, status: "ok", raw: raw ?? "" };
   const found = allowed.filter((a) => new RegExp(`\\b${a}\\b`).test(norm));
   const distinct = [...new Set(found)];
-  if (distinct.length === 1) return { label: distinct[0], status: "extracted" };
-  return { label: null, status: "invalid_output" };
+  if (distinct.length === 1) return { label: distinct[0], status: "extracted", raw: raw ?? "" };
+  return { label: null, status: "invalid_output", raw: raw ?? "" };
 }
 
 function conclude(facts: Facts): string {

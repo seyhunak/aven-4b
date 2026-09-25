@@ -94,12 +94,27 @@ Base-model weights follow their own license.
 
 ```bash
 pip install -r requirements.txt
-python scripts/inference.py --adapter . \\
-  --state "Invoice is 1200 EUR but PO is 1000 EUR." \\
-  --question "What is the reconciliation result?" \\
+python scripts/inference.py --adapter . \
+  --state "Invoice is 1200 EUR but PO is 1000 EUR." \
+  --question "What is the reconciliation result?" \
   --options "A:match|B:mismatch|C:needs_review"
 # -> B
 ```
+
+## Ollama
+
+A Q4_K_M GGUF of the merged model is published for local runs
+(see `Modelfile` in the GitHub repo):
+
+```bash
+ollama pull seyhunak/aven-4b
+ollama run seyhunak/aven-4b "STATE: ... QUESTION: ... OPTIONS: ... ANSWER:"
+```
+
+## Live demo
+
+A Next.js one-pager classifying 50 finance tickets in real time
+(`demo/` in the GitHub repo, `npx .` after `npm run build`).
 """
 
 

@@ -179,30 +179,7 @@ Known limitations (documented, not hidden):
   positions — verify per deployment.
 - Starter data is tiny/synthetic: robustness numbers are directional only.
 
-## 9. Merge & deploy
-
-```bash
-# LoRA deployment (recommended): base + small adapter
-python scripts/inference.py --adapter outputs/aven-4b ...
-
-# Merged deployment: single self-contained dir
-python scripts/merge_adapter.py --adapter outputs/aven-4b --output-dir outputs/aven-4b-merged
-```
-
-Hugging Face:
-
-```bash
-export HF_TOKEN="hf_..."   # never commit this
-python scripts/push_hf.py --adapter outputs/aven-4b --repo-id YOUR_USERNAME/aven-4b
-```
-
-GitHub:
-
-```bash
-./scripts/publish_github.sh YOUR_GITHUB_USERNAME aven-4b
-```
-
-## 10. Live demo (Next.js one-pager)
+## 9. Live demo (Next.js one-pager)
 
 `demo/` is an npx-runnable one-page app: 50 preloaded finance tickets
 (invoice / PO matching, reconciliation triage, duplicates, tolerance,
@@ -218,7 +195,7 @@ Verified 50/50 correct, 0 invalid through the live HTTP path. See
 `demo/README.md`. The demo engine is a deterministic mirror of the decision
 contract; production inference with real weights is `scripts/inference.py`.
 
-## 11. Layout
+## 10. Layout
 
 ```text
 aven-4b/README.md  configs/mac_m3_48gb.yaml  data/*.jsonl
@@ -228,7 +205,7 @@ tests/{test_dataset,test_prompt}.py
 demo/{app,lib,bin}  (Next.js live demo, see demo/README.md)
 ```
 
-## 12. Verified smoke-run results (M3, MPS)
+## 11. Verified smoke-run results (M3, MPS)
 
 Measured on 2026-09-25 — smoke config only (100 train samples, 1 epoch).
 Not a quality claim; shown to prove the pipeline works end to end.
@@ -241,7 +218,7 @@ Not a quality claim; shown to prove the pipeline works end to end.
 On this tiny synthetic set the base model is already strong — expected.
 Real gains require the full config plus a larger, real dataset.
 
-## 13. TODO
+## 12. TODO
 
 - [ ] Exact answer-span masking via offset mapping (current: prompt re-tokenize approx).
 - [ ] CUDA path: bf16 + optional 4-bit (`bitsandbytes`) behind a flag.

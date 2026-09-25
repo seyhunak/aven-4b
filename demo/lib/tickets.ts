@@ -43,73 +43,112 @@ const amt = () => pick(AMTS);
 // ---- Invoice / PO: exact match (A) x5 ----
 for (let i = 0; i < 5; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), j = 1000 + n;
+  const paraphrased = i < 2;
   T.push({ id: id(), category: "Invoice / PO", tag: "invoice-match",
-    state: `Invoice INV-${j} from ${v} is ${a} ${c}. The purchase order PO-${j} is ${a} ${c}. References agree.`,
+    state: paraphrased
+      ? `${v} billed INV-${j} at ${a.toFixed(2)} ${c}; PO-${j} records ${c} ${a.toFixed(2)}. Same amount, same currency.`
+      : `Invoice INV-${j} from ${v} is ${a} ${c}. The purchase order PO-${j} is ${a} ${c}. References agree.`,
     question: Q, options: FIN3, expected: "A",
+    ...(paraphrased ? { variant: "paraphrase" as const } : {}),
     facts: { kind: "recon", a, b: a, curA: c, curB: c } });
 }
 // ---- Invoice / PO: amount mismatch (B) x5 ----
 for (let i = 0; i < 5; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), d = pick([50, 200, 250, 800]), j = 1100 + n;
+  const euroFmt = i === 0;
+  const cc = euroFmt ? "EUR" : c;
   T.push({ id: id(), category: "Invoice / PO", tag: "po-mismatch",
-    state: `Invoice INV-${j} from ${v} is ${a + d} ${c}. The purchase order PO-${j} is ${a} ${c}. No tolerance rule applies.`,
+    state: euroFmt
+      ? `Rechnung INV-${j} von ${v}: €${a + d},00. Bestellung PO-${j}: €${a},00. Keine Toleranzregel.`
+      : `Invoice INV-${j} from ${v} is ${a + d} ${c}. The purchase order PO-${j} is ${a} ${c}. No tolerance rule applies.`,
     question: Q, options: FIN3, expected: "B",
-    facts: { kind: "recon", a: a + d, b: a, curA: c, curB: c } });
+    ...(euroFmt ? { variant: "format" as const } : {}),
+    facts: { kind: "recon", a: a + d, b: a, curA: cc, curB: cc } });
 }
 // ---- Invoice / PO: duplicate invoice (B) x5 ----
 for (let i = 0; i < 5; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), j = 1200 + n;
+  const paraphrased = i === 0;
   T.push({ id: id(), category: "Invoice / PO", tag: "duplicate",
-    state: `Invoice INV-${j} from ${v} for ${a} ${c} was paid on 2026-03-0${1 + (i % 8)}. Identical invoice INV-${j} arrived again today.`,
+    state: paraphrased
+      ? `Accounts payable already cleared INV-${j} (${v}, ${a} ${c}) on 2026-03-01. The same document INV-${j} just reappeared in the inbox.`
+      : `Invoice INV-${j} from ${v} for ${a} ${c} was paid on 2026-03-0${1 + (i % 8)}. Identical invoice INV-${j} arrived again today.`,
     question: "Is the new invoice a duplicate?", options: DUP3, expected: "B",
+    ...(paraphrased ? { variant: "paraphrase" as const } : {}),
     facts: { kind: "recon", a, b: a, curA: c, curB: c, duplicate: true, dupVocab: true } });
 }
 // ---- Invoice / PO: currency mismatch (B) x4 ----
 for (let i = 0; i < 4; i++) {
   const v = pick(VENDORS), c = pick(CURS), c2 = c === "EUR" ? "USD" : "EUR", a = amt(), j = 1300 + n;
+  const symbols = i === 0;
   T.push({ id: id(), category: "Invoice / PO", tag: "currency-mismatch",
-    state: `Invoice INV-${j} from ${v} is billed ${a} ${c} but purchase order PO-${j} is ${a} ${c2}. Numerically equal, currencies differ.`,
+    state: symbols
+      ? `INV-${j} (${v}): $${a.toLocaleString("en-US")} billed, but PO-${j} reads €${a.toLocaleString("de-DE")}. Same digits, different money.`
+      : `Invoice INV-${j} from ${v} is billed ${a} ${c} but purchase order PO-${j} is ${a} ${c2}. Numerically equal, currencies differ.`,
     question: Q, options: FIN3, expected: "B",
+    ...(symbols ? { variant: "format" as const } : {}),
     facts: { kind: "recon", a, b: a, curA: c, curB: c2 } });
 }
 // ---- Invoice / PO: tolerance within (A) x3 + exceeded (B) x2 ----
 for (let i = 0; i < 3; i++) {
   const v = pick(VENDORS), a = amt(), j = 1400 + n;
+  const boundary = i === 0; // exactly at the 5 EUR limit -> still a match
+  const diff = boundary ? 5 : 1;
   T.push({ id: id(), category: "Invoice / PO", tag: "tolerance-ok",
-    state: `Invoice INV-${j} from ${v} is ${a + 1} EUR; purchase order PO-${j} is ${a} EUR. Tolerance rule allows up to 5 EUR.`,
+    state: `Invoice INV-${j} from ${v} is ${a + diff} EUR; purchase order PO-${j} is ${a} EUR. Tolerance rule allows up to 5 EUR.`,
     question: "How should this transaction be classified under the tolerance rule?",
     options: FIN3, expected: "A",
-    facts: { kind: "recon", a: a + 1, b: a, curA: "EUR", curB: "EUR", tolerance: 5 } });
+    ...(boundary ? { variant: "boundary" as const } : {}),
+    facts: { kind: "recon", a: a + diff, b: a, curA: "EUR", curB: "EUR", tolerance: 5 } });
 }
 for (let i = 0; i < 2; i++) {
   const v = pick(VENDORS), a = amt(), j = 1450 + n;
+  const boundary = i === 0; // exactly 1 EUR over the limit -> mismatch
+  const diff = boundary ? 6 : 120;
   T.push({ id: id(), category: "Invoice / PO", tag: "tolerance-exceeded",
-    state: `Invoice INV-${j} from ${v} is ${a + 120} EUR; purchase order PO-${j} is ${a} EUR. Tolerance rule allows up to 5 EUR.`,
+    state: `Invoice INV-${j} from ${v} is ${a + diff} EUR; purchase order PO-${j} is ${a} EUR. Tolerance rule allows up to 5 EUR.`,
     question: "How should this transaction be classified under the tolerance rule?",
     options: FIN3, expected: "B",
-    facts: { kind: "recon", a: a + 120, b: a, curA: "EUR", curB: "EUR", tolerance: 5 } });
+    ...(boundary ? { variant: "boundary" as const } : {}),
+    facts: { kind: "recon", a: a + diff, b: a, curA: "EUR", curB: "EUR", tolerance: 5 } });
 }
+const PAY_ORD: Option[] = [
+  { label: "A", key: "mismatch", description: "Records disagree" },
+  { label: "B", key: "needs_review", description: "Needs human review" },
+  { label: "C", key: "match", description: "Records agree" },
+];
 // ---- Reconciliation: payment match (A) x3 + mismatch (B) x2 ----
 for (let i = 0; i < 3; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), j = 1500 + n;
+  const reordered = i === 0; // same question, shuffled labels -> match is C here
   T.push({ id: id(), category: "Reconciliation", tag: "payment-match",
     state: `Payment of ${a} ${c} to ${v} matches open invoice INV-${j} of ${a} ${c}. Value dates and references agree.`,
-    question: "What is the reconciliation result?", options: FIN3, expected: "A",
+    question: "What is the reconciliation result?",
+    options: reordered ? PAY_ORD : FIN3, expected: reordered ? "C" : "A",
+    ...(reordered ? { variant: "order" as const } : {}),
     facts: { kind: "recon", a, b: a, curA: c, curB: c } });
 }
 for (let i = 0; i < 2; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), d = pick([100, 300]), j = 1550 + n;
+  const paraphrased = i === 0;
   T.push({ id: id(), category: "Reconciliation", tag: "payment-mismatch",
-    state: `Payment of ${a} ${c} to ${v} against open invoice INV-${j} of ${a + d} ${c}. Short-paid, no deduction note attached.`,
+    state: paraphrased
+      ? `${v} sent ${a} ${c} against INV-${j} (${a + d} ${c}). ${d} ${c} light, no deduction note.`
+      : `Payment of ${a} ${c} to ${v} against open invoice INV-${j} of ${a + d} ${c}. Short-paid, no deduction note attached.`,
     question: "What is the reconciliation result?", options: FIN3, expected: "B",
+    ...(paraphrased ? { variant: "paraphrase" as const } : {}),
     facts: { kind: "recon", a, b: a + d, curA: c, curB: c } });
 }
 // ---- Reconciliation: ledger match (A) x3 + mismatch (B) x2 ----
 for (let i = 0; i < 3; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), j = 1600 + n;
+  const paraphrased = i === 0;
   T.push({ id: id(), category: "Reconciliation", tag: "ledger-match",
-    state: `Bank statement shows ${a} ${c} from ${v}. Ledger entry for INV-${j} expects ${a} ${c}. Both agree.`,
+    state: paraphrased
+      ? `Bank line: +${a} ${c} (${v}). Books: INV-${j} for ${a} ${c}. Tied out, zero difference.`
+      : `Bank statement shows ${a} ${c} from ${v}. Ledger entry for INV-${j} expects ${a} ${c}. Both agree.`,
     question: "What is the reconciliation result?", options: FIN3, expected: "A",
+    ...(paraphrased ? { variant: "paraphrase" as const } : {}),
     facts: { kind: "recon", a, b: a, curA: c, curB: c } });
 }
 for (let i = 0; i < 2; i++) {
@@ -122,9 +161,13 @@ for (let i = 0; i < 2; i++) {
 // ---- Triage: missing reference (C) x5 ----
 for (let i = 0; i < 5; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), j = 1700 + n;
+  const paraphrased = i === 0;
   T.push({ id: id(), category: "Triage", tag: "missing-ref",
-    state: `Payment PAY-${j} of ${a} ${c} arrived from ${v} with no invoice reference and no remittance advice.`,
+    state: paraphrased
+      ? `Unapplied cash: ${a} ${c} from ${v} (ref PAY-${j}). No invoice link, no remittance — parked for review.`
+      : `Payment PAY-${j} of ${a} ${c} arrived from ${v} with no invoice reference and no remittance advice.`,
     question: "How should this payment be triaged?", options: FIN3, expected: "C",
+    ...(paraphrased ? { variant: "paraphrase" as const } : {}),
     facts: { kind: "recon", a, b: 0, curA: c, curB: c, missingRef: true } });
 }
 // ---- Triage: needs human review (C) x5 ----
@@ -137,9 +180,13 @@ const REVIEW_STATES = [
 ];
 for (let i = 0; i < 5; i++) {
   const v = pick(VENDORS), c = pick(CURS), a = amt(), j = 1800 + n;
+  const paraphrased = i === 0;
   T.push({ id: id(), category: "Triage", tag: "needs-review",
-    state: `Invoice INV-${j} from ${v} shows ${a} ${c} but ${REVIEW_STATES[i]}.`,
+    state: paraphrased
+      ? `INV-${j} (${v}, ${a} ${c}) flagged: ${REVIEW_STATES[i]} — route to a human.`
+      : `Invoice INV-${j} from ${v} shows ${a} ${c} but ${REVIEW_STATES[i]}.`,
     question: "How should this transaction be triaged?", options: FIN3, expected: "C",
+    ...(paraphrased ? { variant: "paraphrase" as const } : {}),
     facts: { kind: "recon", a, b: 0, curA: c, curB: c, missingRef: true } });
 }
 
