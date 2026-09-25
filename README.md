@@ -13,11 +13,10 @@ Aven-4B
 Small, fast specialist decision model
 ```
 
-Conceptually inspired by the *general approach* demonstrated by Together AI's
-experimental **Tev1-4B** model (a 4B specialist for structured decisions).
-This is an **independent implementation** built only from public open-source
-components — no Tev1 code, weights, datasets, prompts or training examples
-are copied or reproduced.
+Built in a **Jev-style** specialist design: a small model that answers
+form-like classification tasks — invoice / PO matching, reconciliation triage —
+with exactly one label, not prose. Implemented only from public open-source
+components.
 
 Given a `STATE`, a `QUESTION` and fixed `OPTIONS`, Aven returns exactly one
 option label — e.g. `B` — never an essay.

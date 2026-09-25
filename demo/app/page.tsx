@@ -97,8 +97,8 @@ export default function Page() {
           <div className="eyebrow">AVEN-4B · SPECIALIST DECISION MODEL</div>
           <h1>Live classification demo</h1>
           <p className="sub">
-            50 preloaded tickets — invoice matching, reconciliation, support routing,
-            plus adversarial probes. Each ticket is sent to the server in real time and
+            50 preloaded tickets — invoice / PO matching, reconciliation triage,
+            duplicate detection, tolerance handling, plus adversarial probes. Each ticket is sent to the server in real time and
             answered with exactly one label.
           </p>
         </div>

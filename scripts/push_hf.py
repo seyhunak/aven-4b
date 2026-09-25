@@ -35,10 +35,10 @@ fine-tuned with LoRA for *structured decisions*, not open-ended chat. Given a
 STATE, a QUESTION and a fixed set of OPTIONS it returns exactly one option
 label (e.g. `B`).
 
-> Inspired by the general approach demonstrated by Together AI's experimental
-> Tev1-4B model (structured-decision specialist). This is an **independent
-> implementation** — no proprietary Tev1 code, weights, datasets, prompts or
-> training examples are used or reproduced.
+> Built in a **Jev-style** specialist design: a small model for form-like
+> classification tasks (invoice / PO matching, reconciliation triage) that
+> returns exactly one label. Independent implementation built only from public
+> open-source components.
 
 ## Intended use
 

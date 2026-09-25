@@ -1,6 +1,7 @@
 # aven-4b-demo — live classification demo page
 
-One-page Next.js app. 50 preloaded tickets (finance, general, adversarial),
+One-page Next.js app. 50 preloaded tickets (invoice / PO matching,
+reconciliation triage, duplicate detection, tolerance handling, adversarial),
 each classified in real time by the server (`/api/classify`) under Aven's
 label-only contract.
 
