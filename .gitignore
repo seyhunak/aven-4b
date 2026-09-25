@@ -14,3 +14,7 @@ hf_token*
 wandb/
 .DS_Store
 .pytest_cache/
+# Next.js demo
+demo/node_modules/
+demo/.next/
+demo/out/
